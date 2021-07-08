@@ -61,15 +61,15 @@ class Simulate:
         simtType = simType.lower() # remove case sensitivity 
         if simType == "a":
             data = self.airgapSweep(B,E,step)
-            print("Processing. This may take a minute")
+            print("Processing. This may take a minute...")
             anim = self.airgapAnimate(data)
         elif simType == "p":
             data = self.preloadSweep(B,E,step)
-            print("Processing. This may take a minute")
+            print("Processing. This may take a minute...")
             anim = self.preloadAnimate(data)
         elif simType == "s":
             data = self.springRateSweep(B,E,step)
-            print("Processing. This may take a minute")
+            print("Processing. This may take a minute...")
             anim = self.springRateAnimate(data)
         elif simType == "u":
             simType = input("Select simulation Type: (a)irgap sweep, (p)reload sweep, (s)pring rate sweep (a,p,s) ")
@@ -96,7 +96,7 @@ class Simulate:
         
     def saveAnimation(self, jsAnim):
         savePrompt = input("Save model to disk, as HTML? (Select y if running outside of jupyter notebook) (y/n) ").lower()
-        if savePrompt == 'y':
+        if savePrompt == "y":
             path = input("Path to save file: ")
             name = input("File name: ")
             if name[-5:].lower() !=".html":
@@ -110,6 +110,10 @@ class Simulate:
                 print("Error saving file at: %s" % fullPath)
                 print("check save path and ensure you have permission to access destination folder.")
                 self.saveAnimation(jsAnim)
+        elif savePrompt == "n":
+            pass
+        else:
+            self.saveAnimation(jsAnim)
                     
     def airgapSweep(self, B,E,step=0.5):
         if B <= 0:
