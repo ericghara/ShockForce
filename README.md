@@ -1,6 +1,6 @@
 # ShockForce
 ### OVERVIEW
-This is a collection of methods that models the static forces of a motorcycle front fork (suspension).  The intent is to visualize how changes to air gap, spring preload and spring rate affect a motorcycle suspension. ShockForce generates graphic animations using matplotlib, allowing changes to the aforementioned variables to be visualized. 
+This is a collection of methods that models the static forces of a motorcycle front fork (suspension).  The intent is to visualize how changes to the variables: air gap, spring preload and spring rate affect a motorcycle suspension. ShockForce generates graphic animations using matplotlib, allowing changes to the aforementioned variables to be visualized. 
 
 ### EXAMPLES
 
