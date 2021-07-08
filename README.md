@@ -34,5 +34,5 @@ This is a collection of methods that models the static forces of a motorcycle fr
       * Modeled as an ideal spring (spring rate 0.87 kg/mm, unless otherwise specified)
   2. Gas Forces:
       * Calculated using ideal gas law.  These forces arise from isothermal compression of air in the headspace as the fork (motorcycle front suspension) compresses.
-* For the variable being modeled (air gap, spring preload or spring rate), gas force sweeps through a range of values, traveling from user specified beginning to end values in user defined increments.  For each variable value in the sweep, the forces across the full range of suspension travel are modeled.
+* For the variable being modeled (air gap, spring preload or spring rate), ShockForce sweeps through a range of values, traveling from user specified beginning to end values in user defined increments.  For each variable value in the sweep, the forces across the full range of suspension travel are modeled.
 
