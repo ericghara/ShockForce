@@ -30,7 +30,7 @@ This is a collection of methods that models the static forces of a motorcycle fr
 * The geometry of the fork is based around a 2015 Yamaha FZ-07, but general trends should apply to all motorcycles with damper rod forks.
 * Only static forces are modeled.  Dynamic forces (shock damping) are not modeled.
 * Static forces are broken down into:
-  1. Spring forces:
+  1. Spring Forces:
       * Modeled as an ideal spring (spring rate 0.87 kg/mm, unless otherwise specified)
   2. Gas Forces:
       * Calculated using ideal gas law.  These forces arise from isothermal compression of air in the headspace as the fork (motorcycle front suspension) compresses.
