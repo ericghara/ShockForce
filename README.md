@@ -1,6 +1,6 @@
 # ShockForce
 ### OVERVIEW
-This program models the static forces of a motorcycle front fork (suspension).  The intent is to visualize how changes to the variables: air gap, spring preload and spring rate affect a motorcycle suspension. ShockForce generates graphic animations using matplotlib, allowing changes to the aforementioned variables to be visualized. 
+This program models the static forces of a motorcycle front fork (suspension).  The intent is to visualize how changes to the variables: air gap, spring preload and spring rate affect a motorcycle fork. ShockForce generates graphic animations using matplotlib, allowing changes to the aforementioned variables to be visualized. 
 
 ### EXAMPLES
 
@@ -34,5 +34,5 @@ This program models the static forces of a motorcycle front fork (suspension).  
       * Modeled as an ideal spring (spring rate: 0.87 kg/mm, unless otherwise specified)
   2. Gas Forces:
       * Calculated using ideal gas law.  These forces arise from isothermal compression of air in the headspace as the fork (motorcycle front suspension) compresses.
-* For the variable being modeled (air gap, spring preload or spring rate), ShockForce sweeps through a range of values, traveling from user specified beginning to end values in user defined increments.  For each variable value in the sweep, the forces across the full range of suspension travel are modeled.
+* For the variable being modeled (air gap, spring preload or spring rate), ShockForce sweeps through a range of values, traveling from user specified beginning to end values in user defined increments.  For each variable value in the sweep, the forces across the full range of fork travel are modeled.
 
