@@ -26,24 +26,29 @@ class Wrapper:
         }
 
 
-    def x(self):
-        return self.simTypeCBoxDict
-
     def comboBoxLogic(self, app, index):
         dictKey = [*self.simTypeCBoxDict.keys()][index]
         simType = self.simTypeCBoxDict[dictKey]
         #Remove this conditional check once changing sweep feature implemented
         if simType in self.simTypeCBoxDict.values():
-            B, E, D = self.simTypeDefaultValsDict[simType]
-            fig, ims = self.SimulateWrapper(simType, B, E, D)
             self.simType = simType
+            B, E, D = self.simTypeDefaultValsDict[simType]
+            fig, ims = self.SimulateWrapper(B, E, D)
         else:
             print('Error comboBoxLogic received unrecognized SimType: "%s' % simType)
             return -1
         app.refreshAnimation(fig, ims)
         app.refreshLabels()
+        app.refreshLEdits(simType)
 
-    def SimulateWrapper(self, simType, B, E, duration):
+    def SimulateWrapper(self, B, E, duration, simType=None):
+        if simType == None:
+            simType = self.simType
+        elif simType in self.simTypeCBoxDict.keys():
+            #Manually set simType, haven't tested this feature
+            self.simType = simType
+        else:
+            print("Error - SimulateWrapper received unrecognized simType: %s" % str(simType))
         step = self.durationLogic(B, E, duration)
         sim = ShockForce.Simulate()
         fig, ims = sim.get_data(simType, B, E, step)
