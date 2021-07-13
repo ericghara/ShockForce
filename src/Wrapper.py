@@ -10,10 +10,10 @@ class Wrapper:
             "Airgap": "a"
         }
         self.simTypeUnitsDict = {
-            "s": "kg/mm",
-            "p": "cm",
-            "a": "cm"
-        }
+            "s": ("kg/mm", "kg/mm", "sec"),
+            "p": ("cm", "cm", "sec"),
+            "a": ("cm", "cm", "sec")
+        } # B unit, E unit, Duration unit
         self.simTypeDefaultValsDict = {
             "s": (0.00, 1.30, 4),
             "p": (0.00, 10.5, 4),
@@ -25,6 +25,7 @@ class Wrapper:
             "a": {"BE" : (0.01, 10.5), "D" : (0, 20)}
         }
 
+
     def x(self):
         return self.simTypeCBoxDict
 
@@ -35,10 +36,12 @@ class Wrapper:
         if simType in self.simTypeCBoxDict.values():
             B, E, D = self.simTypeDefaultValsDict[simType]
             fig, ims = self.SimulateWrapper(simType, B, E, D)
+            self.simType = simType
         else:
             print('Error comboBoxLogic received unrecognized SimType: "%s' % simType)
             return -1
         app.refreshAnimation(fig, ims)
+        app.refreshLabels()
 
     def SimulateWrapper(self, simType, B, E, duration):
         step = self.durationLogic(B, E, duration)
