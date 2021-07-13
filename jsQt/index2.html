@@ -1,0 +1,27 @@
+<html>
+<head>
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+    <style>
+      ::selection {
+        background:transparent;
+      }
+    </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Yo!</h2>
+  </div>
+  <script language="JavaScript">
+        new QWebChannel(qt.webChannelTransport, function (channel) {
+          window.handler = channel.objects.handler;
+          handler.test1("bunny",function(retVal) {
+            // console.error as console.log messages don't show up in the python console
+            console.error(JSON.stringify(retVal));
+          })
+
+        });
+      </script>
+
+</body>
+</html>
