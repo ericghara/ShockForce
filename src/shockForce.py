@@ -61,7 +61,7 @@ class ShockForce:
 
 
 class Simulate:
-    # Methods to visualize data from ShockForce model
+    # Methods to visualize data from oldShockForce model
     def __init__(self):
         self.fig = None #matplotlib figure obj
         self.ax =  None #matplotlib axis objects
