@@ -1,6 +1,6 @@
 from src import ShockForce
 
-class Wrapper():
+class Wrapper:
     def __init__(self):
         self.FPS = 60
         self.simType = "s"
@@ -26,7 +26,7 @@ class Wrapper():
         }
 
     def x(self):
-        return self.SimTypeCBoxDict
+        return self.simTypeCBoxDict
 
     def comboBoxLogic(self, app, index):
         dictKey = [*self.simTypeCBoxDict.keys()][index]
@@ -63,3 +63,4 @@ class Wrapper():
         # BED policy from dicts
         #get annotation True/False
         pass
+

@@ -2,13 +2,13 @@ from matplotlib import animation
 import sys
 from PyQt5 import QtWidgets, QtCore, QtGui
 from matplotlib.backends.backend_qt5agg import (FigureCanvas)
-from src import Wrapper as Logic
+from src import Wrapper
 
 
 class ApplicationWindow(QtWidgets.QMainWindow):
     def __init__(self, Form):
-        #global Logic
-        #Logic = Wrapper()
+        global Logic
+        Logic = Wrapper.Wrapper()
         super().__init__()
         ##Matplotlib Vars
         self.fig = None
@@ -32,8 +32,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.simTypeCBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.simTypeCBox.setFrame(True)
         self.simTypeCBox.setObjectName("simTypeCBox")
-        key = Logic.x()
-        for text in [*key.keys()]:
+        for text in [*Logic.simTypeCBoxDict.keys()]:
             self.simTypeCBox.addItem(text)
         self.simTypeCBox.currentIndexChanged.connect(lambda i: Logic.comboBoxLogic(self,i))
         # Label text
