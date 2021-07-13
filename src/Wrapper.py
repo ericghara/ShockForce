@@ -3,7 +3,7 @@ from src import ShockForce
 class Wrapper:
     def __init__(self):
         self.FPS = 60
-        self.simType = "s"
+        self.simType = "a"
         self.simTypeCBoxDict = {
             "Spring Rate": "s",
             "Spring Preload": "p",
@@ -29,15 +29,7 @@ class Wrapper:
     def comboBoxLogic(self, app, index):
         dictKey = [*self.simTypeCBoxDict.keys()][index]
         simType = self.simTypeCBoxDict[dictKey]
-        #Remove this conditional check once changing sweep feature implemented
-        if simType in self.simTypeCBoxDict.values():
-            self.simType = simType
-            B, E, D = self.simTypeDefaultValsDict[simType]
-            fig, ims = self.SimulateWrapper(B, E, D)
-        else:
-            print('Error comboBoxLogic received unrecognized SimType: "%s' % simType)
-            return -1
-        app.refreshAnimation(fig, ims)
+        self.simType = simType
         app.refreshLabels()
         app.refreshLEdits(simType)
 

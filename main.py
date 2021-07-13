@@ -89,6 +89,11 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.fig = fig
         self.ims = ims
 
+    def refreshComboBox(self, simType):
+        list = [*Logic.simTypeCBoxDict.values()]
+        index = list.index(simType)
+        self.simTypeCBox.setCurrentIndex(index)
+
     def refreshLabels(self):
         # Units
         text = list(Logic.simTypeUnitsDict[Logic.simType])  #returns list of all units required by simType B,E,D
@@ -120,13 +125,14 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             val = float(w.text())
             simParams.append(val)
         B, E, D = simParams
-        print(type(B), type(E), type(D))
         fig, ims = Logic.SimulateWrapper(B, E, D)
         self.refreshAnimation(fig,ims)
 
     def setup(self):
+        simType = Logic.simType
+        self.refreshComboBox(simType)
         self.refreshLabels()
-        self.refreshLEdits(Logic.simType)
+        self.refreshLEdits(simType)
         self.goButtonClick()
 
 if __name__ == "__main__":
@@ -134,6 +140,4 @@ if __name__ == "__main__":
     Form = QtWidgets.QWidget()
     app = ApplicationWindow(Form)
     app.show()
-    print("x: %d, y: %d" % (app.canvas.x(), app.canvas.y()))
-    print(app.canvas.geometry())
     qapp.exec_()
