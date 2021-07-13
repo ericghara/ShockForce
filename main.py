@@ -54,26 +54,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             unit.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
             self.HLayout.addWidget(unit)
             self.LEditDict["unitWidgets"].append(unit)
-        """
-        self.LEditLabel0 = QtWidgets.QLabel(Form)
-        self.LEditLabel0.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
-        self.LEditLabel0.setObjectName("LEditLabel1")
-        self.HLayout.addWidget(self.LEditLabel0)
-        # Input box
-        self.LEdit0 = QtWidgets.QLineEdit(Form)
-        self.LEdit0.setMaximumSize(QtCore.QSize(50, 30))
-        self.LEdit0.setObjectName("lineEdit1")
-        self.HLayout.addWidget(self.LEdit0)
-        #Unit label
-        self.LEditUnit0 = QtWidgets.QLabel(Form)
-        self.LEditUnit0.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
-        self.LEditUnit0.setObjectName("LEditUnit1")
-        self.HLayout.addWidget(self.LEditUnit0)
-        self.LEditLabel0.setText("Beginning")
-        self.LEditUnit0.setText("UNITS")
-        # Loop to make All
-        #------>Add me
-        """
         QtCore.QMetaObject.connectSlotsByName(Form)
         self.layout.addLayout(self.HLayout)
         self.HLayout.insertWidget(0, self.simTypeCBox)
