@@ -110,7 +110,11 @@ class ApplicationWindow(QtWidgets.QMainWindow):
     def refreshLEdits(self, simType=False):
         if simType in Logic.simTypeDefaultValsDict.keys() :
             defaultVals = Logic.simTypeDefaultValsDict[simType]
-            for t, w in zip(defaultVals, self.LEditDict["LEditWidgets"]):
+            validatorRules = Logic.simTypeValMinMax[simType].values()
+            widgets = self.LEditDict["LEditWidgets"]
+            for (min_, max_), t, w in zip(validatorRules, defaultVals, widgets): #(validator min max), LEdit default text, LEdit widget
+                validator = QtGui.QDoubleValidator(min_, max_, 2, notation=0)  # notation 0 sets to standard vs sci notation
+                w.setValidator(validator)
                 t = str(round(t,2))
                 w.setText(t)
         elif simType == False:
@@ -118,15 +122,48 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         else:
             print("Error - refreshLEdits: unrecognized simType: %s" % str(simType))
 
+    def LEditSetError(self, setError, index0, index1=None):
+        widgets = [self.LEditDict["LEditWidgets"][index0]]
+        args = [index0] #arguments to be passed onto LEditClearError
+        if index1 != None: # this is for B > E scenarios where need to highlight both B and E
+            args.append(index1)
+            widgets.append(self.LEditDict["LEditWidgets"][index1])
+        args.insert(0, False) # this adds setError argument so when this function is called it knows to clear the error
+        if setError == True:
+            for w in widgets:
+                w.setStyleSheet("background-color: pink;")
+                w.textChanged.connect(lambda: self.LEditSetError(*args))
+        elif setError == False:
+            for w in widgets:
+                w.setStyleSheet("background-color: white;")
+                w.disconnect() # remember to disconnect from textChanged.connect
+
+
+
+
     def goButtonClick(self):
         #Get text from LEdits
         simParams = [] #B, E, D
-        for w in self.LEditDict["LEditWidgets"]:
-            val = float(w.text())
+        widgets = self.LEditDict["LEditWidgets"]
+        for w in widgets:
+            validator = w.validator()
+            val = (w.text())
+            state, value, pos = validator.validate(val, 0) #value is return by validator but we aren't using,  pos is also return, unused by validator, unsure what it does
+            if state != QtGui.QValidator.Acceptable:
+                index = widgets.index(w)
+                self.LEditSetError(True, index)
+                return False
+            val = float(val)
             simParams.append(val)
         B, E, D = simParams
+        if B >= E:
+            labels = self.LEditDict["labels"]
+            indexB, indexE =  labels.index("Beginning:"), labels.index("End:")
+            self.LEditSetError(True,indexB,indexE)
+            return False
         fig, ims = Logic.SimulateWrapper(B, E, D)
         self.refreshAnimation(fig,ims)
+        return True
 
     def setup(self):
         simType = Logic.simType

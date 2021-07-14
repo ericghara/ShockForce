@@ -20,11 +20,10 @@ class Wrapper:
             "a": (0.05, 10.5, 4)
         }  # Format: simType : (B, E, Animation Length (s)
         self.simTypeValMinMax = {
-            "s": {"BE" : (0.00, 9.99), "D" : (0,20)},
-            "p": {"BE" : (0.00, 10.5), "D" : (0, 20)},
-            "a": {"BE" : (0.01, 10.5), "D" : (0, 20)}
-        }
-
+            "s": {"B" : (0.00, 9.99), "E" : (0.00, 9.99), "D" : (0,20)},
+            "p": {"B" : (0.00, 10.5), "E" : (0.00, 10.5), "D" : (0, 20)},
+            "a": {"B" : (0.01, 10.5), "E" : (0.01, 10.5), "D" : (0, 20)}
+        } # format: simtype: {input : (min,max)...}
 
     def comboBoxLogic(self, app, index):
         dictKey = [*self.simTypeCBoxDict.keys()][index]
