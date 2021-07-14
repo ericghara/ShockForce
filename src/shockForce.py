@@ -69,7 +69,7 @@ class Simulate:
         self.xmax = None # Max fork travel (used to set x axis)
         self.ymax = 800  # y axis max, set arbitrarily as y data tends towards infinity
 
-    def get_data(self, simType="u", B=None, E=None, step=None):
+    def get_data(self, simType="u", B=None, E=None, step=None, annotations=False):
         # If no args given then prompt user for simulation variables, otherwise run simulations using given variables
         simtType = simType.lower()  # remove case sensitivity
         funcDict = {
@@ -80,7 +80,7 @@ class Simulate:
         if simType in list(funcDict.keys()):
             data = funcDict[simType](B, E, step)
             print("Processing. This may take a minute...")
-            self.dataAnimate(simType, data)
+            self.dataAnimate(simType, data, annotations)
         elif simType == "u":
             simType = input("Select simulation Type: (a)irgap sweep, (p)reload sweep, (s)pring rate sweep (a,p,s) ")
             if simType == "a":
@@ -94,8 +94,9 @@ class Simulate:
             elif simType == "s":
                 B = float(input("Softest spring rate modeled (cm): (0.0-1.3 recommended) "))
                 E = float(input("Firmest spring rate modeled (cm): (0.0-1.3 recommended) "))
-                step = float(input("Increment sprin grate increased by (cm): (0.01-0.25 recommended) "))
-            return self.get_data(simType, B, E, step)
+                step = float(input("Increment spring rate increased by (cm): (0.01-0.25 recommended) "))
+            annotations = bool(input("Would you like annotations to be added? (0/1) "))
+            return self.get_data(simType, B, E, step, annotations)
         else:
             print("Error: unrecognized simulation type (simType) selected")
             return False
@@ -175,50 +176,53 @@ class Simulate:
             springRate -= step
         return df
 
-    def dataAnimateHelper(self, simType, key, df):
+    def dataAnimateHelper(self, simType, key, df, annotations=True):
         #This is helper function returns lines and annotation artists specific to each simulation type
         ann = []  # List of annotations
         if simType == "a":
             title = "Air Gap: " + str(round(key, 1)) + " cm"  # need to round due to float representation error
-            ann.append(
-                self.ax.annotate('Max Fork Travel ', fontsize=19, xy=(round(df.index[-1], 2), self.ymax / 2), xycoords='data',
-                            xytext=(int(self.xmax / 2), self.ymax * 7 / 8), textcoords='data',
-                            arrowprops=dict(arrowstyle="simple, head_length=0.4,head_width=0.4, tail_width=0.1",
-                                            shrinkA=15, shrinkB=0, facecolor="black"),
-                            horizontalalignment='center', verticalalignment='top'))
+            if annotations == True:
+                ann.append(
+                    self.ax.annotate('Max Fork Travel ', fontsize=19, xy=(round(df.index[-1], 2), self.ymax / 2), xycoords='data',
+                                xytext=(int(self.xmax / 2), self.ymax * 7 / 8), textcoords='data',
+                                arrowprops=dict(arrowstyle="simple, head_length=0.4,head_width=0.4, tail_width=0.1",
+                                                shrinkA=15, shrinkB=0, facecolor="black"),
+                                horizontalalignment='center', verticalalignment='top'))
         elif simType == "p":
             preloadForce = df['Spring Force'].min()  # Base preload force (ie spring force at 0cm compression)
             title = "Preload: " + str(round(key, 1)) + " cm"  # need to round due to float representation error
-            ann.append(self.ax.axline((df.index[0], preloadForce), (df.index[-1], preloadForce), color="black"))
-            ann.append(self.ax.annotate(text='Preload Force', fontsize=19, xy=(self.xmax / 2, preloadForce), xycoords='data',
-                                   xytext=(self.xmax / 2, self.ymax / 2), textcoords='data',
-                                   arrowprops=dict(arrowstyle="simple, head_length=0.4,head_width=0.4, tail_width=0.1",
-                                                   shrinkA=15, shrinkB=0, facecolor="black"),
-                                   horizontalalignment='center', verticalalignment='top'))
+            if annotations == True:
+                ann.append(self.ax.axline((df.index[0], preloadForce), (df.index[-1], preloadForce), color="black"))
+                ann.append(self.ax.annotate(text='Preload Force', fontsize=19, xy=(self.xmax / 2, preloadForce), xycoords='data',
+                                       xytext=(self.xmax / 2, self.ymax / 2), textcoords='data',
+                                       arrowprops=dict(arrowstyle="simple, head_length=0.4,head_width=0.4, tail_width=0.1",
+                                                       shrinkA=15, shrinkB=0, facecolor="black"),
+                                       horizontalalignment='center', verticalalignment='top'))
         elif simType == "s":
             degrees_ = degrees(
                 tan((df.iloc[300]["Spring Force"] - df.iloc[0]["Spring Force"]) / (df.index[300] - df.index[0]) * (
                         self.xmax / self.ymax)))  # the xmax/ymax normalizes with respect to x,y axis scales
             title = "Spring Rate: " + str(round(key + .001, 3))[
                                       :-1] + " kg/mm"  # need to round due to float representation error
-            line1, = self.ax.plot((df.index[0], df.index[300]),
-                             (df.iloc[0]["Spring Force"], df.iloc[300]["Spring Force"]),
-                             color="black")  # hypotenuse note format here is (x1,x2 vals), (y1, y2 vals), also see line2 comment
-            ann.append(line1)
-            line2, = self.ax.plot((df.index[0], df.index[300]),
-                             (df.iloc[0]["Spring Force"], df.iloc[0]["Spring Force"]),
-                             color="black")  # Base, comma after line2 trick to return single Line2D primitive instead of container list
-            ann.append(line2)
-            ann.append(
-                self.ax.annotate(text='', fontsize=19, xy=(df.index[300], df.iloc[300]["Spring Force"]), xycoords='data',
-                            xytext=(df.index[300], df.iloc[0]["Spring Force"]), textcoords='data',
-                            arrowprops=dict(arrowstyle="simple, head_length=0.3,head_width=0.3, tail_width=0.05",
-                                            connectionstyle="arc3,rad=.3", shrinkA=0, shrinkB=0, facecolor="black"),
-                            horizontalalignment='center', verticalalignment='top'))  # Curvy Arrow
-            ####Below: Fix this currently text moves
-            ann.append(self.ax.text(df.index[320], self.ymax*.03, str(round(degrees_)) + "°",
-                               fontsize=19, verticalalignment='center',
-                               horizontalalignment='left'))  # Text position fixed, but value is not, y pos is not.  Hence y pos set by first item in data list (greatest springrate)
+            if annotations == True:
+                line1, = self.ax.plot((df.index[0], df.index[300]),
+                                 (df.iloc[0]["Spring Force"], df.iloc[300]["Spring Force"]),
+                                 color="black")  # hypotenuse note format here is (x1,x2 vals), (y1, y2 vals), also see line2 comment
+                ann.append(line1)
+                line2, = self.ax.plot((df.index[0], df.index[300]),
+                                 (df.iloc[0]["Spring Force"], df.iloc[0]["Spring Force"]),
+                                 color="black")  # Base, comma after line2 trick to return single Line2D primitive instead of container list
+                ann.append(line2)
+                ann.append(
+                    self.ax.annotate(text='', fontsize=19, xy=(df.index[300], df.iloc[300]["Spring Force"]), xycoords='data',
+                                xytext=(df.index[300], df.iloc[0]["Spring Force"]), textcoords='data',
+                                arrowprops=dict(arrowstyle="simple, head_length=0.3,head_width=0.3, tail_width=0.05",
+                                                connectionstyle="arc3,rad=.3", shrinkA=0, shrinkB=0, facecolor="black"),
+                                horizontalalignment='center', verticalalignment='top'))  # Curvy Arrow
+                ####Below: Fix this currently text moves
+                ann.append(self.ax.text(df.index[320], self.ymax*.03, str(round(degrees_)) + "°",
+                                   fontsize=19, verticalalignment='center',
+                                   horizontalalignment='left'))  # Text position fixed, but value is not, y pos is not.  Hence y pos set by first item in data list (greatest springrate)
         else:
             print('Error: dataAnimateHelper received an incorrect simType: "%s' % simType)
             return -1
@@ -227,13 +231,13 @@ class Simulate:
                                fontsize=17)) # Title annotation is something all animations share, placed outside of conditional statement chain
         return ann
 
-    def dataAnimate(self,simType, data):
+    def dataAnimate(self,simType, data, annotations):
         self.xmax = data[0][1].index.max()  # Max fork travel (used to set x axis)
         self.fig, self.ax = plt.subplots()
         for key, df in data:
             im = plt.stackplot(df.index, df["Spring Force"], df["Gas Force"],
                                colors=("tab:blue", "tab:orange"), animated=True)  # returns list of 2 polycollections
-            im.extend(self.dataAnimateHelper(simType, key, df))
+            im.extend(self.dataAnimateHelper(simType, key, df, annotations))
             if key == data[0][0]:  # If we're at first frame, so do formatting setup
                 labels = list(df.columns)
                 self.legend = self.ax.legend(handles=im, labels=labels, loc='upper left', fontsize=15)

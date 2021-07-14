@@ -10,6 +10,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         global Logic
         Logic = Wrapper.Wrapper()
         super().__init__()
+        self.setWindowTitle("ShockForce")
+        self.setWindowIcon(QtGui.QIcon("ui/img/icon.png"))
         # Matplotlib Vars
         self.fig = None
         self.ims = None
@@ -20,10 +22,15 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         # hlayout
         self.HLayout = QtWidgets.QHBoxLayout(Form)
         self.HLayout.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
-        self.HLayout.setContentsMargins(0, 0, 0, 0)
-        self.HLayout.setSpacing(0)
+        #self.HLayout.setContentsMargins(0, 0, 0, 0)
+        self.HLayout.setSpacing(2)
         self.HLayout.setObjectName("HLayout")
         self.layout.addLayout(self.HLayout)
+        # simTypeLabel
+        self.simTypelabel = QtWidgets.QLabel(Form)
+        self.simTypelabel.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
+        self.simTypelabel.setText("Simulation Type:")
+        self.HLayout.addWidget(self.simTypelabel)
         # simTypeCBox
         self.simTypeCBox = QtWidgets.QComboBox(Form)
         #self.simTypeCBox.setSizeAdjustPolicy(0)
@@ -34,12 +41,14 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.simTypeCBox.setFrame(True)
         self.simTypeCBox.setObjectName("simTypeCBox")
         self.simTypeCBox.raise_()
-        self.HLayout.insertWidget(0, self.simTypeCBox)
+        self.HLayout.addWidget(self.simTypeCBox)
         for text in [*Logic.simTypeCBoxDict.keys()]:
             self.simTypeCBox.addItem(text)
         self.simTypeCBox.currentIndexChanged.connect(lambda i: Logic.comboBoxLogic(self, i))
+        # Stretch 0
+        self.HLayout.addStretch(3)
         # Labels, LEdit box, units
-        self.LEditDict = {"labels": ("Beginning:", "End:", "Animation Length:"),
+        self.LEditDict = {"labels": ("Smallest:", "Largest:", "Animation Length:"),
                           "labelWidgets": [],
                           "LEditWidgets": [],
                           "unitWidgets": []
@@ -47,6 +56,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         for l in self.LEditDict["labels"]:
             label = QtWidgets.QLabel(Form)
             label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTrailing | QtCore.Qt.AlignVCenter)
+            label.setMaximumSize(QtCore.QSize(120, 30))
             self.HLayout.addWidget(label)
             self.LEditDict["labelWidgets"].append(label)
             LEdit = QtWidgets.QLineEdit(Form)
@@ -56,13 +66,18 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             self.LEditDict["LEditWidgets"].append(LEdit)
             unit = QtWidgets.QLabel(Form)
             unit.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+            unit.setMaximumSize(50,30)
             self.HLayout.addWidget(unit)
             self.LEditDict["unitWidgets"].append(unit)
+            # Stretch 1: Between LEdit groups
+            self.HLayout.addStretch(2)
+        #stretch 2
+        self.HLayout.addStretch(2)
         # Annotations?
         self.annotCkBox = QtWidgets.QCheckBox(Form)
         self.annotCkBox.setObjectName("annotCkBox")
-        self.HLayout.addWidget(self.annotCkBox)
         self.annotCkBox.setText("Annotations")
+        self.HLayout.addWidget(self.annotCkBox)
         # Go Button
         self.goButton = QtWidgets.QPushButton(Form)
         self.goButton.setObjectName("goButton")
@@ -107,10 +122,12 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         for t, w in zip(text, widgets):
             w.setText(t)
 
-    def refreshLEdits(self, simType=False):
+    def refreshInputs(self, simType=False):
         if simType in Logic.simTypeDefaultValsDict.keys() :
-            defaultVals = Logic.simTypeDefaultValsDict[simType]
+            defaultVals = list(Logic.simTypeDefaultValsDict[simType])
             validatorRules = Logic.simTypeValMinMax[simType].values()
+            AnnotationsState = defaultVals.pop() # This isn't super clean: default vals includes annotations state but has no min_,max_ or text so can't include in loop below
+            self.annotCkBox.setChecked(AnnotationsState)
             widgets = self.LEditDict["LEditWidgets"]
             for (min_, max_), t, w in zip(validatorRules, defaultVals, widgets): #(validator min max), LEdit default text, LEdit widget
                 validator = QtGui.QDoubleValidator(min_, max_, 2, notation=0)  # notation 0 sets to standard vs sci notation
@@ -138,7 +155,9 @@ class ApplicationWindow(QtWidgets.QMainWindow):
                 w.setStyleSheet("background-color: white;")
                 w.disconnect() # remember to disconnect from textChanged.connect
 
-
+    def annotationsCKState(self):
+        state = self.annotCkBox.isChecked() #Returns True/False
+        return state
 
 
     def goButtonClick(self):
@@ -161,7 +180,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             indexB, indexE =  labels.index("Beginning:"), labels.index("End:")
             self.LEditSetError(True,indexB,indexE)
             return False
-        fig, ims = Logic.SimulateWrapper(B, E, D)
+        annotations = self.annotationsCKState()
+        fig, ims = Logic.SimulateWrapper(B, E, D, annotations)
         self.refreshAnimation(fig,ims)
         return True
 
@@ -169,7 +189,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         simType = Logic.simType
         self.refreshComboBox(simType)
         self.refreshLabels()
-        self.refreshLEdits(simType)
+        self.refreshInputs(simType)
         self.goButtonClick()
 
 if __name__ == "__main__":
