@@ -1,6 +1,10 @@
-from src import ShockForce
+from src import ShockForce, SecondaryWindows
+from matplotlib import animation
+from copy import copy
+from PyQt5 import QtCore
 
 class Wrapper:
+
     def __init__(self):
         self.FPS = 60
         self.simType = "a"
@@ -24,6 +28,7 @@ class Wrapper:
             "p": {"B" : (0.00, 10.5), "E" : (0.00, 10.5), "D" : (0, 30)},
             "a": {"B" : (0.01, 10.5), "E" : (0.01, 10.5), "D" : (0, 30)}
         } # format: simtype: {input : (min,max)...}
+        self.anim = None
 
     def comboBoxLogic(self, app, index):
         dictKey = [*self.simTypeCBoxDict.keys()][index]
@@ -52,14 +57,35 @@ class Wrapper:
         step = (E-B)/frames
         return step
 
-    def goButtonLogic(self):
-        #get combobox value
-        #get B
-        #get E
-        #get duration
-        #Check for input errors
-        # B < E
-        # BED policy from dicts
-        #get annotation True/False
-        pass
+    def saveLogic(self,app, fig, ims):
+        returnVal = True
+        Save = SecondaryWindows.SaveDialog()
+        path, filetype = Save.dialog()
+        if (path, filetype) == (False, False): # user pressed cancel
+            return False
+        elif filetype[-5:-1] not in path: # Fixes a bug where user selects an existing file of different extension QFileDialog butchers path
+            path = path[:-4] + filetype[-5:-1]
+        app.canvas.setVisible(False)
+        app.loadingMessage("s")
+        print("Saving %s to %s" % (filetype[-4:-1], path))
+        newfig = copy(fig)  # Need to copy or we will change the animation currently being displayed in mainwindow
+        if "htm" in filetype:
+            length = int(len(ims) / 2 + 1)  # Calculates original length before reflection
+            frames = ims[:length]  # Slices ims to original length
+            anim = animation.ArtistAnimation(newfig, frames, interval=10, blit=True)
+            jsAnim = anim.to_jshtml(default_mode="reflect")
+            try:
+                with open(path, "w") as f:
+                    f.write(jsAnim)
+            except:
+                print("Error saving file at: %s" % fullPath)
+                print("check save path and ensure you have permission to access destination folder.")
+                returnVal = False
+        elif "gif" in filetype:
+            self.anim.save(path, writer='imagemagick', fps=self.FPS) #Note we are calling self.anim which is the anim being displayed in mainwindow
 
+        elif "mp4" in filetype:
+            self.anim.save(path, writer='ffmpeg', fps=self.FPS)  # Note we are calling self.anim which is the anim being displayed in mainwindow"""
+        app.delLoadingMessage()
+        app.canvas.setVisible(True)
+        return returnVal

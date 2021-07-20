@@ -1,28 +1,34 @@
 from matplotlib import animation
 import sys
 from PyQt5 import QtWidgets, QtCore, QtGui
-from matplotlib.backends.backend_qt5agg import (FigureCanvas)
+from matplotlib.backends.backend_qt5agg import FigureCanvas
 from src import Wrapper
 
-
 class ApplicationWindow(QtWidgets.QMainWindow):
+
     def __init__(self, Form):
+        super().__init__()
+        QtCore.QMetaObject.connectSlotsByName(Form)
         global Logic
         Logic = Wrapper.Wrapper()
-        super().__init__()
+        # MainWindow
         self.setWindowTitle("ShockForce")
-        self.setWindowIcon(QtGui.QIcon("ui/img/icon.png"))
+        self.setWindowIcon(QtGui.QIcon("ui/img/main.png"))
+        self.resize(1088, 681)  # MainWindow size on startup
+        self.setMinimumSize(895, 579) # determined empirically
+        self.font_= QtGui.QFont("Arial", 8, QtGui.QFont.StyleNormal)
+        self.setFont(self.font_)
+        self.setCentralWidget(Form)
         # Matplotlib Vars
         self.fig = None
         self.ims = None
         # UI Setup Vars
         self.canvas = None
-        self.setCentralWidget(Form)
+        # parent layout
         self.layout = QtWidgets.QVBoxLayout(Form)
-        # hlayout
+        # hlayout - child layout
         self.HLayout = QtWidgets.QHBoxLayout(Form)
         self.HLayout.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
-        #self.HLayout.setContentsMargins(0, 0, 0, 0)
         self.HLayout.setSpacing(2)
         self.HLayout.setObjectName("HLayout")
         self.layout.addLayout(self.HLayout)
@@ -33,9 +39,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.HLayout.addWidget(self.simTypelabel)
         # simTypeCBox
         self.simTypeCBox = QtWidgets.QComboBox(Form)
-        #self.simTypeCBox.setSizeAdjustPolicy(0)
-        #self.simTypeCBox.resize(self.simTypeCBox.sizeHint())
-        #self.simTypeCBox.resize(50, 25)
         self.simTypeCBox.setMaximumSize(QtCore.QSize(125, 30))
         self.simTypeCBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.simTypeCBox.setFrame(True)
@@ -77,32 +80,77 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.annotCkBox = QtWidgets.QCheckBox(Form)
         self.annotCkBox.setObjectName("annotCkBox")
         self.annotCkBox.setText("Annotations")
+        self.annotCkBox.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.HLayout.addWidget(self.annotCkBox)
-        # Go Button
+        # goButton
         self.goButton = QtWidgets.QPushButton(Form)
         self.goButton.setObjectName("goButton")
         self.goButton.clicked.connect(self.goButtonClick)
+        self.goButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.HLayout.addWidget(self.goButton)
         self.goButton.setText("Render")
-        #
-        QtCore.QMetaObject.connectSlotsByName(Form)
-        self.setup()
+        # saveButton
+        self.saveButton = QtWidgets.QPushButton(Form)
+        self.saveButton.clicked.connect(lambda: Logic.saveLogic(self, self.fig, self.ims))
+        self.saveButton.setIcon(QtGui.QIcon("ui/img/save.png"))
+        self.saveButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.HLayout.addWidget(self.saveButton)
+        # loadingLabel
+        self.loadingLabel = QtWidgets.QLabel()
+        self.loadingLabel.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignCenter | QtCore.Qt.AlignBottom)
+        self.loadingLabel.setStyleSheet("""QWidget {background-color: rgb(255, 255, 255);
+                                        font-size: 36px;
+                                        font-family: "Arial";
+                                        padding: 86;
+                                        image: url(ui/img/icon.png);
+                                        color: rgb(0, 0, 255);
+                                        }""")
+
+
+    def delAnimation(self):
+        if self.fig != None: # if true we aren't in startup
+            self.canvas.setVisible(False)
+            self.layout.removeWidget(self.canvas)  # Removing, then adding is a hack, attempts to refresh didn't work
+            Logic.anim._stop()
+            self.canvas.deleteLater()  #This is how you should delete the canvas
+            self.fig.clf()
+            return True
+        return False # We're at startup
 
     def refreshAnimation(self, fig, ims):
-        if self.fig != None: # if true we aren't in startup
-            self.layout.removeWidget(self.canvas)  # Removing, then adding is a hack, attempts to refresh didn't work
-            # self.canvas.deleteLater()  #This is how you should delete the canvas
-            self.fig.clf()
-            self.fig.canvas.draw_idle()
-            self.layout.update()
-        else:
-            print("Refresh Animation starting up")
         self.canvas = FigureCanvas(fig)
         self.layout.insertWidget(0, self.canvas)  # Animation
         Logic.anim = animation.ArtistAnimation(fig, ims, interval=10, blit=True)
         fig.canvas.draw_idle()
         self.fig = fig
         self.ims = ims
+
+    def delLoadingMessage(self):
+        if self.loadingLabel.isVisible():
+            self.loadingLabel.setVisible(False)
+            self.layout.removeWidget(self.loadingLabel)
+
+
+    def loadingMessage(self,preset,message=None):
+        messageDict = {"r" : "   Rendering...",
+                       "s" : "   Saving please stand by..."}
+        geo = QtCore.QRect(11, 11, 1066, 600) # default geometry of self.canvas on startup
+        if preset in messageDict.keys() and message==None: #: #select preset message
+            message = messageDict[preset]
+        elif not preset and message: #Custom Message
+            if type(message) != str:
+                print("Error loadingMessage: loading message type is not a string")
+                return False
+        else:
+            print("Error loadingMessage: unrecognized preset")
+            return False
+        if self.fig: #Not at startup, get canvas geometry (user may have resized window)
+            geo = self.canvas.geometry()
+        self.loadingLabel.setText(message)
+        self.loadingLabel.setGeometry(geo)
+        self.loadingLabel.setVisible(True)
+        self.layout.insertWidget(0, self.loadingLabel)
+        qapp.processEvents()  # Force qapp to process all events in queue
 
     def refreshComboBox(self, simType):
         list = [*Logic.simTypeCBoxDict.values()]
@@ -159,7 +207,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         state = self.annotCkBox.isChecked() #Returns True/False
         return state
 
-
     def goButtonClick(self):
         #Get text from LEdits
         simParams = [] #B, E, D
@@ -167,8 +214,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         for w in widgets:
             validator = w.validator()
             val = (w.text())
-            state, value, pos = validator.validate(val, 0) #value is return by validator but we aren't using,  pos is also return, unused by validator, unsure what it does
-            if state != QtGui.QValidator.Acceptable:
+            state, value, pos = validator.validate(val, 0) # value and pos unused but validate returns these too
+            if state != QtGui.QValidator.Acceptable: # Aceeptable are fields that got through validator's input mask, but are also invalid
                 index = widgets.index(w)
                 self.LEditSetError(True, index)
                 return False
@@ -181,8 +228,13 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             self.LEditSetError(True,indexB,indexE)
             return False
         annotations = self.annotationsCKState()
+        #print("Rendering Type: %s, B: %d, E: %d, D: %d, Annot: %r." % (Logic.simType, B, E, D, annotations)) # Enable for debug
+        print("Rendering")
+        self.delAnimation()
+        self.loadingMessage("r")
         fig, ims = Logic.SimulateWrapper(B, E, D, annotations)
         self.refreshAnimation(fig,ims)
+        self.delLoadingMessage()
         return True
 
     def setup(self):
@@ -197,4 +249,5 @@ if __name__ == "__main__":
     Form = QtWidgets.QWidget()
     app = ApplicationWindow(Form)
     app.show()
+    app.setup() # prepare MainWindow and render first animation
     qapp.exec_()

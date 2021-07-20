@@ -79,7 +79,7 @@ class Simulate:
         }
         if simType in list(funcDict.keys()):
             data = funcDict[simType](B, E, step)
-            print("Processing. This may take a minute...")
+            #print("Processing. This may take a minute...") # Remove for Qt version
             self.dataAnimate(simType, data, annotations)
         elif simType == "u":
             simType = input("Select simulation Type: (a)irgap sweep, (p)reload sweep, (s)pring rate sweep (a,p,s) ")
@@ -219,7 +219,6 @@ class Simulate:
                                 arrowprops=dict(arrowstyle="simple, head_length=0.3,head_width=0.3, tail_width=0.05",
                                                 connectionstyle="arc3,rad=.3", shrinkA=0, shrinkB=0, facecolor="black"),
                                 horizontalalignment='center', verticalalignment='top'))  # Curvy Arrow
-                ####Below: Fix this currently text moves
                 ann.append(self.ax.text(df.index[320], self.ymax*.03, str(round(degrees_)) + "°",
                                    fontsize=19, verticalalignment='center',
                                    horizontalalignment='left'))  # Text position fixed, but value is not, y pos is not.  Hence y pos set by first item in data list (greatest springrate)
@@ -232,7 +231,7 @@ class Simulate:
         return ann
 
     def dataAnimate(self,simType, data, annotations):
-        self.xmax = data[0][1].index.max()  # Max fork travel (used to set x axis)
+        self.xmax = 10.5 #not using data[0][1].index.max() for QtApp to avoid confusion from axis rescale  # Max fork travel (used to set x axis)
         self.fig, self.ax = plt.subplots()
         for key, df in data:
             im = plt.stackplot(df.index, df["Spring Force"], df["Gas Force"],
@@ -248,6 +247,5 @@ class Simulate:
                 self.ax.tick_params(axis='y', labelsize=15)
                 self.fig.set_size_inches(10.66, 6)
             self.ims.append(im)
-        #anim = animation.ArtistAnimation(fig, ims, interval=20, blit=True)
-        return 0
+        return True
 
