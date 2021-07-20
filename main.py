@@ -63,7 +63,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             self.HLayout.addWidget(label)
             self.LEditDict["labelWidgets"].append(label)
             LEdit = QtWidgets.QLineEdit(Form)
-            LEdit.setMaximumSize(QtCore.QSize(50, 30))
+            LEdit.setMaximumSize(QtCore.QSize(40, 30))
             LEdit.setAlignment(QtCore.Qt.AlignRight)
             self.HLayout.addWidget(LEdit)
             self.LEditDict["LEditWidgets"].append(LEdit)
@@ -224,7 +224,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         B, E, D = simParams
         if B >= E:
             labels = self.LEditDict["labels"]
-            indexB, indexE =  labels.index("Beginning:"), labels.index("End:")
+            indexB, indexE =  labels.index("Smallest:"), labels.index("Largest:")
             self.LEditSetError(True,indexB,indexE)
             return False
         annotations = self.annotationsCKState()
