@@ -1,6 +1,6 @@
 # ShockForce
 ### OVERVIEW
-This program models the static forces of a motorcycle front suspension.  This is intended as a tool to both educate and inform riders about how common, easily changed paramaters, affect a motorcycle suspension.  This is achieved through rendering a series of graphs where a single paramater is changed in linear space and assembling them into an animation.  The user interface was created using Qt (pyQt5) and the data visualization with Matplotlib.  The data itself is calculated by a "homespun" class using methodology described below.
+This is a tool to both educate and inform riders about how common, easily changed parameters, affect a motorcycle suspension.  This program renders a series of graphs where a single suspension parameter is changed in linear space and assembles them into an animation.  The user interface was created using Qt (pyQt5) and the data visualization with Matplotlib.  The data itself is calculated by a "homespun" class using a methodology described below.
 
 <div align="center"><img src=https://user-images.githubusercontent.com/87097441/126754682-3edc998d-a5c7-4963-a1f2-11302277080a.jpg width="700" height="auto"/></div>
 
