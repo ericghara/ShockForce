@@ -11,7 +11,7 @@ This program models the static forces of a motorcycle front fork (suspension).  
 
 <p float="left" align="center">
 <img src=https://user-images.githubusercontent.com/87097441/124851501-81eeed00-df57-11eb-8caf-3ec4f25d9536.gif href=https://htmlpreview.github.io/?https://github.com/ericghara/ShockForce/blob/main/examples/airgap.html alt="Air gap animation" height="auto" width="475" />
-<img src=https://user-images.githubusercontent.com/87097441/124851507-85827400-df57-11eb-9aae-0cd5bf845540.gif href=https://htmlpreview.github.io/?https://github.com/ericghara/ShockForce/blob/main/examples/preload.html alt="Preload animation" height="auto" width="475" />
+<img src=https://user-images.githubusercontent.com/87097441/124851507-85827400-df57-11eb-9aae-0cd5bf845540.gif href=https://htmlpreview.github.io/?https://github.com/ericghara/ShockForce/blob/main/examples/preload.html alt="Preload animation" height="auto" width="475" /><br>
 <b>Airgap sweep from 0 to 10.5 cm in 0.05 cm increments (left)</b><br>
 <b>Spring preload sweep from 0.05 to 10.5 cm in 0.05 cm increments (right)</b><br> 
 </p>
