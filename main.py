@@ -27,7 +27,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         # parent layout
         self.layout = QtWidgets.QVBoxLayout(Form)
         # hlayout - child layout
-        self.HLayout = QtWidgets.QHBoxLayout(Form)
+        self.HLayout = QtWidgets.QHBoxLayout()
         self.HLayout.setSizeConstraint(QtWidgets.QLayout.SetDefaultConstraint)
         self.HLayout.setSpacing(2)
         self.HLayout.setObjectName("HLayout")
