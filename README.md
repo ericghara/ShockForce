@@ -26,6 +26,23 @@ This is a tool to both educate and inform riders about how common, easily change
     </tr>
 </table>
 
+### INSTALL GUIDE
+1) Clone the repository.
+```
+cd $SAVE_DIR
+git clone https://github.com/ericghara/ShockForce/
+cd ShockForce
+```
+2) Install dependencies (preferably in a new python 3.8 <a href=https://docs.python.org/3/library/venv.html>virtual environment</a>). 
+```
+pip install -r requirements.txt
+```
+3) Run program
+```
+python main.py
+```
+
+
 ### METHODOLOGY
 * The geometry of the fork is based around a 2015 Yamaha FZ-07, but general trends should apply to all motorcycles with damper rod forks.
 * Only static forces are modeled.  Dynamic forces (shock damping) are not modeled.
