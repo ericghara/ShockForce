@@ -63,6 +63,8 @@ class Wrapper:
         path, filetype = Save.dialog()
         if (path, filetype) == (False, False): # user pressed cancel
             return False
+        elif "." != path[-4]: #fixes bug in linux env where no ext is added to filename
+            path = path + filetype[-5:-1]
         elif filetype[-5:-1] not in path: # Fixes a bug where user selects an existing file of different extension QFileDialog butchers path
             path = path[:-4] + filetype[-5:-1]
         app.canvas.setVisible(False)
